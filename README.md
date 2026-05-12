@@ -7,24 +7,45 @@ A 3D shadow puzzle game built with Unity, inspired by [Shadowmatic](http://www.s
 
 ---
 
+> ⚠️ **Work in Progress** — This project is currently in active development.
+> Level 1 is playable. More levels and features are coming.
+
+---
+
 ## 🎮 Concept
 
 The player manipulates one or several 3D objects placed in the foreground. By rotating and moving them, they must create a shadow on the background wall that matches a recognizable silhouette. Each puzzle has a name that gives a subtle hint about the expected shape — without ever revealing it directly.
 
 ---
 
-## 🕹️ Controls
+## 🕹️ Controls & Difficulty Levels
 
-| Action | Input |
-|---|---|
-| Horizontal rotation | Click + Drag |
-| Vertical rotation | Ctrl + Click + Drag |
-| Move object | Shift + Click + Drag |
+The game is designed to be played with a **mouse only**. Controls unlock progressively depending on the difficulty level.
 
-> The game is designed to be played with a **mouse only**.
+| Level | Description | Controls |
+|---|---|---|
+| **Level 1** | One object | Click + Drag to rotate horizontally |
+| **Level 2** | One object | + Ctrl + Click + Drag to rotate vertically |
+| **Level 3** | Multiple objects | + Shift + Click + Drag to move objects |
 
 ---
 
+## 🎬 Gameplay Preview
+
+> Level 1 snippet — rotate the object to match the shadow shape.
+
+[Movie_003.webm](https://github.com/user-attachments/assets/6bc0ee1e-9e19-44d5-b774-872b56420b70)
+
+---
+## ✨ Features
+
+- **Shadow validation** — the puzzle is solved when the shadow matches the target shape closely enough, held for a brief moment
+- **Cinematic on solve** — the camera zooms toward the shadow with a smooth animation and letterbox effect
+- **Music with wind effect** — ambient soundtrack with a low-pass filter that clears when the puzzle is solved
+- **Holographic UI** — styled interface with animated buttons and custom fonts
+- **Progress saving** — one save per device in Normal mode
+
+---
 ## 📋 Game Modes
 
 ### Normal Mode
@@ -35,26 +56,6 @@ The player manipulates one or several 3D objects placed in the foreground. By ro
 ### Test Mode
 - All puzzles are unlocked from the start
 - Designed for evaluation and testing purposes
-
----
-
-## 🔢 Difficulty Levels
-
-| Level | Description |
-|---|---|
-| **Level 1** | One object — horizontal rotation only |
-| **Level 2** | One object — horizontal and vertical rotations |
-| **Level 3** | Multiple objects — rotations and free movement |
-
----
-
-## ✨ Features
-
-- **Shadow validation** — the puzzle is solved when the shadow matches the target shape closely enough, held for a brief moment
-- **Cinematic on solve** — the camera zooms toward the shadow with a smooth animation and letterbox effect
-- **Music with wind effect** — ambient soundtrack with a low-pass filter that clears when the puzzle is solved
-- **Holographic UI** — styled interface with animated buttons and custom fonts
-- **Progress saving** — one save per device in Normal mode
 
 ---
 
