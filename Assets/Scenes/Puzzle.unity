@@ -1493,11 +1493,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleManager
   objectToTrack: {fileID: 1718370991}
-  targets:
-  - rotation: {x: 1.35, y: 84.239, z: 12.031}
-    position: {x: 1.30667, y: 2.857206, z: -5.344568}
   toleranceDegrees: 2
-  tolerancePosition: 2
   puzzleSolvedPanel: {fileID: 1208678099}
   solvedText: {fileID: 1042233964}
   solvedMessage: Puzzle Solved!
@@ -1507,6 +1503,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   musicManager: {fileID: 308867888}
+  targets:
+  - rotation: {x: 1.35, y: 84.239, z: 12.031}
+    position: {x: 1.30667, y: 2.857206, z: -5.344568}
+  tolerancePosition: 2
+  validationDelay: 1
 --- !u!4 &853958837
 Transform:
   m_ObjectHideFlags: 0
@@ -1667,10 +1668,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1208678100}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -160, y: -750}
+  m_SizeDelta: {x: 200, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1042233964
 MonoBehaviour:

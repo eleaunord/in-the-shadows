@@ -38,10 +38,27 @@ public class ObjectRotator3 : MonoBehaviour
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                // Check if this object was clicked
-                ObjectRotator3 clicked = hit.collider.GetComponent<ObjectRotator3>();
+                // DEBUG : shows exactly what the ray touched
+                Debug.Log("[RAYCAST] Hit: " + hit.collider.gameObject.name);
+
+                // GetComponentInParent walks up the hierarchy, so the script
+                // is found even if the Collider sits on a child mesh object
+                ObjectRotator3 clicked = hit.collider.GetComponentInParent<ObjectRotator3>();
+
                 if (clicked != null)
+                {
                     selectedObject = clicked;
+                    Debug.Log("[SELECTED] " + clicked.gameObject.name);
+                }
+                else
+                {
+                    Debug.Log("[NO ROTATOR] " + hit.collider.gameObject.name +
+                              " has no ObjectRotator3 on itself or its parents.");
+                }
+            }
+            else
+            {
+                Debug.Log("[RAYCAST] Hit nothing.");
             }
         }
     }
@@ -75,12 +92,9 @@ public class ObjectRotator3 : MonoBehaviour
 
         if (isShift)
         {
-            // SHIFT + drag → move object relative to camera plane
-            Vector3 right   = Camera.main.transform.right;
-            Vector3 up      = Camera.main.transform.up;
-
-            transform.position += right * (deltaX * moveSpeed)
-                                + up    * (deltaY * moveSpeed);
+            // SHIFT + drag → move on world X and Y only, never on Z (depth locked)
+            Vector3 move = new Vector3(deltaX * moveSpeed, deltaY * moveSpeed, 0f);
+            transform.position += move;
         }
         else if (isCtrl)
         {
