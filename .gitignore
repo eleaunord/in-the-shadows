@@ -70,3 +70,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*Assets/Models/scratched-wall/source/scratched-wall.zip
 *.tif
+*.zip
