@@ -227,7 +227,9 @@ public class PuzzleManager3 : MonoBehaviour
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(mainMenuSceneName);
+        SaveManager.Instance.MarkPuzzleSolved(3);
+        SaveManager.Instance.SkipToLevelSelect = true;
+        SceneManager.LoadScene("MainMenu");
     }
 
     // Quits the application
