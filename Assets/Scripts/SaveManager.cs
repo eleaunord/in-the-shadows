@@ -2,11 +2,27 @@ using UnityEngine;
 
 /// <summary>
 /// Persistent singleton tracking puzzle progress and the current game mode.
-/// Survives scene loads via DontDestroyOnLoad.
+/// Survives scene loads via DontDestroyOnLoad. Auto-instantiates itself on
+/// first access so it works even when Play Mode starts directly inside a
+/// level scene instead of MainMenu.
 /// </summary>
 public class SaveManager : MonoBehaviour
 {
-    public static SaveManager Instance { get; private set; }
+    private static SaveManager _instance;
+    public static SaveManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                GameObject go = new GameObject("SaveManager");
+                _instance = go.AddComponent<SaveManager>();
+                DontDestroyOnLoad(go);
+            }
+            return _instance;
+        }
+    }
+
     public bool SkipToLevelSelect { get; set; } = false;
     private const int TOTAL_PUZZLES = 3;
     private const string SOLVED_KEY_PREFIX = "Puzzle_Solved_"; // + index
@@ -23,12 +39,12 @@ public class SaveManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
             return;
         }
-        Instance = this;
+        _instance = this;
         DontDestroyOnLoad(gameObject);
     }
 

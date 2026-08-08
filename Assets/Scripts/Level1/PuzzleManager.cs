@@ -127,6 +127,7 @@ public class PuzzleManager : MonoBehaviour
     // Loads the main menu scene
     public void GoToMainMenu()
     {
+        Debug.Log("gotomain menu called");
         Time.timeScale = 1f;
         SaveManager.Instance.MarkPuzzleSolved(1);
          
