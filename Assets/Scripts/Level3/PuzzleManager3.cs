@@ -51,13 +51,31 @@ public class PuzzleManager3 : MonoBehaviour
     [Header("Audio")]
     public MusicManager musicManager;      // handles music transition on solve
 
+    [Header("Debug")]
+    public bool enableExtendedDebugLog = true; // toggle the extended per-solution diagnostic logs in the Console
+    public float debugLogInterval = 0.5f;      // throttle: extended logs print at most this often (seconds)
+
     private bool isSolved = false;              // prevents solving the puzzle multiple times
     private float validationTimer = 0f;        // tracks how long ALL parts have held the same solution
     private int lastMatchedSolutionIndex = -1; // solution index matched on the previous frame
+    private float debugLogTimer = 0f;          // throttle timer for LogAllSolutionsDebug()
 
     void Update()
     {
         if (isSolved) return;
+
+        // DEBUG EXTENDED — throttled diagnostic: for every solution and every tracked part,
+        // shows per-axis diffs and highlights the closest solution. Purely additive, does not
+        // affect matched/validationTimer or any existing validation logic below.
+        if (enableExtendedDebugLog)
+        {
+            debugLogTimer += Time.deltaTime;
+            if (debugLogTimer >= debugLogInterval)
+            {
+                debugLogTimer = 0f;
+                LogAllSolutionsDebug();
+            }
+        }
 
         int matched = FindMatchingSolutionIndex();
 
@@ -125,18 +143,15 @@ public class PuzzleManager3 : MonoBehaviour
         return -1;
     }
 
-    // Checks all 3 rotation axes and position distance for one part against one target
+    // Checks rotation (as a single 3D angular difference, immune to Euler-angle
+    // decomposition ambiguity near gimbal lock) and position distance for one part
+    // against one target
     private bool IsPartAlignedToTarget(Transform obj, PartTarget target)
     {
-        Vector3 current = obj.localEulerAngles;
-
-        float diffX = Mathf.Abs(Mathf.DeltaAngle(current.x, target.targetRotation.x));
-        float diffY = Mathf.Abs(Mathf.DeltaAngle(current.y, target.targetRotation.y));
-        float diffZ = Mathf.Abs(Mathf.DeltaAngle(current.z, target.targetRotation.z));
-
-        bool rotationOk = diffX <= toleranceDegrees &&
-                          diffY <= toleranceDegrees &&
-                          diffZ <= toleranceDegrees;
+        Quaternion currentRot = obj.localRotation;
+        Quaternion targetRot = Quaternion.Euler(target.targetRotation);
+        float angleDiff = Quaternion.Angle(currentRot, targetRot);
+        bool rotationOk = angleDiff <= toleranceDegrees;
 
         float distPos = Vector3.Distance(obj.localPosition, target.targetPosition);
         bool positionOk = distPos <= tolerancePosition;
@@ -156,21 +171,89 @@ public class PuzzleManager3 : MonoBehaviour
             PartTarget target = sol.partTargets[i];
             Vector3 current = obj.localEulerAngles;
 
+            // Raw per-axis Euler diffs kept for reference only (can look large near
+            // gimbal lock even when the actual orientation matches) — angleDiff below
+            // is what now decides rotationOk.
             float diffX = Mathf.Abs(Mathf.DeltaAngle(current.x, target.targetRotation.x));
             float diffY = Mathf.Abs(Mathf.DeltaAngle(current.y, target.targetRotation.y));
             float diffZ = Mathf.Abs(Mathf.DeltaAngle(current.z, target.targetRotation.z));
 
-            bool rotationOk = diffX <= toleranceDegrees &&
-                              diffY <= toleranceDegrees &&
-                              diffZ <= toleranceDegrees;
+            Quaternion currentRot = obj.localRotation;
+            Quaternion targetRot = Quaternion.Euler(target.targetRotation);
+            float angleDiff = Quaternion.Angle(currentRot, targetRot);
+            bool rotationOk = angleDiff <= toleranceDegrees;
 
             float distPos = Vector3.Distance(obj.localPosition, target.targetPosition);
             bool positionOk = distPos <= tolerancePosition;
 
             Debug.Log("[Sol " + solutionIndex + "] " + obj.name +
-                      " | rotDiff: " + diffX.ToString("F1") + "/" + diffY.ToString("F1") + "/" + diffZ.ToString("F1") +
+                      " | rotAngleDiff: " + angleDiff.ToString("F1") +
+                      " (raw axes: " + diffX.ToString("F1") + "/" + diffY.ToString("F1") + "/" + diffZ.ToString("F1") + ")" +
                       " | posDist: " + distPos.ToString("F2") +
                       " | rotOK: " + rotationOk + " | posOK: " + positionOk);
+        }
+    }
+
+    // DEBUG EXTENDED — for every solution (not just a matching one) and every tracked part,
+    // logs the per-axis rotation diff and position distance with a ✓/✗ pass/fail marker, then
+    // highlights whichever solution has the lowest total score (i.e. the closest one to reach).
+    // Read-only diagnostic: never touches trackedParts, solutions, or any validation state.
+    private void LogAllSolutionsDebug()
+    {
+        if (trackedParts.Count == 0 || solutions.Count == 0) return;
+
+        int closestSolutionIndex = -1;
+        float closestScore = float.MaxValue;
+
+        for (int s = 0; s < solutions.Count; s++)
+        {
+            Solution sol = solutions[s];
+            if (sol.partTargets.Count != trackedParts.Count) continue;
+
+            float solutionScore = 0f;
+
+            for (int i = 0; i < trackedParts.Count; i++)
+            {
+                Transform obj = trackedParts[i].objectToTrack;
+                if (obj == null) continue;
+
+                PartTarget target = sol.partTargets[i];
+                Vector3 current = obj.localEulerAngles;
+
+                // Raw per-axis Euler diffs — informational only now, they no longer
+                // decide pass/fail (see rotAngleDiff below, based on Quaternion.Angle).
+                float diffX = Mathf.Abs(Mathf.DeltaAngle(current.x, target.targetRotation.x));
+                float diffY = Mathf.Abs(Mathf.DeltaAngle(current.y, target.targetRotation.y));
+                float diffZ = Mathf.Abs(Mathf.DeltaAngle(current.z, target.targetRotation.z));
+
+                Quaternion currentRot = obj.localRotation;
+                Quaternion targetRot = Quaternion.Euler(target.targetRotation);
+                float angleDiff = Quaternion.Angle(currentRot, targetRot);
+                bool okAngle = angleDiff <= toleranceDegrees;
+
+                float distPos = Vector3.Distance(obj.localPosition, target.targetPosition);
+                bool okPos = distPos <= tolerancePosition;
+
+                solutionScore += angleDiff + distPos;
+
+                string rotStr = okAngle
+                    ? $"rotAngle diff={angleDiff:F1}° ✓"
+                    : $"rotAngle diff={angleDiff:F1}° ✗ (raw axes: {diffX:F1}/{diffY:F1}/{diffZ:F1})";
+                string posStr = okPos ? $"posDist={distPos:F2} ✓" : $"posDist={distPos:F2} ✗ (target={target.targetPosition}, current={obj.localPosition})";
+
+                Debug.Log($"[Solution {s}] {obj.name}: {rotStr} | {posStr}");
+            }
+
+            if (solutionScore < closestScore)
+            {
+                closestScore = solutionScore;
+                closestSolutionIndex = s;
+            }
+        }
+
+        if (closestSolutionIndex >= 0)
+        {
+            Debug.Log($"[Solution {closestSolutionIndex}] TOTAL SCORE: {closestScore:F1} (closest solution so far)");
         }
     }
 
