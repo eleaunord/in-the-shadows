@@ -25,9 +25,8 @@ public class PuzzleButtonUI : MonoBehaviour
             return;
         }
 
-        bool isCompleted = solved;
-        lockIcon.SetActive(!isCompleted);
-        solvedCheckmark.SetActive(isCompleted);
+        lockIcon.SetActive(!unlocked);
+        solvedCheckmark.SetActive(solved);
     }
 
     public void OnClicked()

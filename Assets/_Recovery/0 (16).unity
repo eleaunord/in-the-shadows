@@ -891,7 +891,7 @@ MonoBehaviour:
     position: {x: 1.394071, y: 2.342239, z: -3.568322}
   - rotation: {x: 4.833, y: 95.323, z: 4.831}
     position: {x: 1.364103, y: 2.299402, z: -3.56514}
-  tolerancePosition: 0.2
+  tolerancePosition: 0.5
   validationDelay: 1
 --- !u!1 &1042233962
 GameObject:

@@ -72,17 +72,13 @@ public class PuzzleManager2 : MonoBehaviour
     {
         foreach (TargetTransform target in targets)
         {
-            Vector3 current = objectToTrack.localEulerAngles;
+            // Compare the full 3D orientation as a single angular distance.
+            // Quaternion.Angle avoids the per-axis Euler ambiguity that
+            // breaks down near gimbal lock (Y rotation close to 90°), where
+            // X and Z can legitimately diverge a lot for the same orientation.
+            float angleDiff = Quaternion.Angle(objectToTrack.localRotation, Quaternion.Euler(target.rotation));
 
-            // Compare each relevant axis separately using DeltaAngle
-            // to correctly handle the 0/360 wraparound on each one
-            float diffX = Mathf.Abs(Mathf.DeltaAngle(current.x, target.rotation.x));
-            float diffY = Mathf.Abs(Mathf.DeltaAngle(current.y, target.rotation.y));
-
-            // Both axes must be within tolerance (AND, not OR)
-            bool rotationOk = diffX <= toleranceDegrees && diffY <= toleranceDegrees;
-
-            if (rotationOk)
+            if (angleDiff <= toleranceDegrees)
                 return true;
         }
         return false;
