@@ -891,7 +891,25 @@ MonoBehaviour:
     position: {x: 1.394071, y: 2.342239, z: -3.568322}
   - rotation: {x: 4.833, y: 95.323, z: 4.831}
     position: {x: 1.364103, y: 2.299402, z: -3.56514}
-  tolerancePosition: 0.2
+  - rotation: {x: -34.849, y: -86.207, z: -0.837}
+    position: {x: 1.470606, y: 2.243689, z: -2.794273}
+  - rotation: {x: 5.225, y: -89.188, z: -2.637}
+    position: {x: 1.490983, y: 2.249257, z: -2.795536}
+  - rotation: {x: 1.575, y: -88.413, z: -2.07}
+    position: {x: 1.492354, y: 2.250327, z: -2.795562}
+  - rotation: {x: -38.702, y: -84.125, z: -3.197}
+    position: {x: 1.505438, y: 2.231115, z: -2.796508}
+  - rotation: {x: -37.469, y: -84.981, z: -0.459}
+    position: {x: 1.477567, y: 2.245575, z: -2.794579}
+  - rotation: {x: -10.772, y: -87.479, z: -0.256}
+    position: {x: 1.488018, y: 2.254855, z: -2.794366}
+  - rotation: {x: -25.844, y: -86.016, z: -1.731}
+    position: {x: 1.478976, y: 2.23974, z: -2.795682}
+  - rotation: {x: -14.555, y: -87.248, z: -1.106}
+    position: {x: 1.484627, y: 2.247396, z: -2.795037}
+  - rotation: {x: -8.232, y: -88.518, z: -2.371}
+    position: {x: 1.481175, y: 2.242128, z: -2.795503}
+  tolerancePosition: 1
   validationDelay: 1
 --- !u!1 &1042233962
 GameObject:
