@@ -16,7 +16,7 @@ public class PuzzleManager2 : MonoBehaviour
 
     [Header("Puzzle Setup")]
     public Transform objectToTrack;         // the object the player rotates
-    public float toleranceDegrees = 15f;    // how close the rotation needs to be to validate
+    public float toleranceDegrees = 8f;    // how close the rotation needs to be to validate
 
     [Header("UI")]
     public GameObject puzzleSolvedPanel;    // panel displayed when the puzzle is solved

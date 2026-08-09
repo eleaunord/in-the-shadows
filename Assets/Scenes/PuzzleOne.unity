@@ -858,7 +858,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleManager2
   objectToTrack: {fileID: 1616855699}
-  toleranceDegrees: 2
+  toleranceDegrees: 9
   puzzleSolvedPanel: {fileID: 1208678099}
   solvedText: {fileID: 1042233964}
   solvedMessage: Puzzle Solved!
