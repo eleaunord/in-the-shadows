@@ -1786,25 +1786,7 @@ MonoBehaviour:
       targetPosition: {x: 1.951836, y: 2.490035, z: 0}
     - targetRotation: {x: -71.398, y: 96.64, z: 0.329}
       targetPosition: {x: 2.487905, y: 2.487905, z: 0}
-  - partTargets:
-    - targetRotation: {x: 3.143, y: -177.23, z: -10.831}
-      targetPosition: {x: 0.19217, y: 5.0499, z: 0}
-    - targetRotation: {x: 0, y: 167.641, z: 0}
-      targetPosition: {x: 0.764, y: 2.59, z: 0}
-    - targetRotation: {x: 2.59, y: -90.507, z: -103.259}
-      targetPosition: {x: 1.655179, y: 1.883934, z: 0}
-    - targetRotation: {x: -98.799, y: 114.272, z: -34.66}
-      targetPosition: {x: 1.534589, y: 5.4173, z: 0}
-  - partTargets:
-    - targetRotation: {x: 1.904, y: -177.452, z: -10.024}
-      targetPosition: {x: -0.177824, y: 4.570001, z: 0}
-    - targetRotation: {x: 0, y: 167.642, z: 0}
-      targetPosition: {x: 0.534096, y: 1.97, z: 0}
-    - targetRotation: {x: 1.477, y: -92.841, z: -100.562}
-      targetPosition: {x: 1.375178, y: 1.583934, z: 0}
-    - targetRotation: {x: -105.551, y: 64.263, z: 19.967}
-      targetPosition: {x: 1.174589, y: 4.947299, z: 0}
-  toleranceDegrees: 15
+  toleranceDegrees: 13
   tolerancePosition: 0.6
   validationDelay: 1
   puzzleSolvedPanel: {fileID: 1208678099}
