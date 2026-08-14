@@ -4,6 +4,32 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 
+/*
+Gros chgmnt avec PuzzleManager.cs : IsTransformClose()
+
+Mathf.DeltaAngle -> Quaternion.Angle
+Version Niveau 1 : 
+float diffY = Mathf.Abs(Mathf.DeltaAngle(
+    objectToTrack.localEulerAngles.y, target.rotation.y));
+bool rotationOk = diffY <= toleranceDegrees;
+
+Version Niveau 2 :
+float angleDiff = Quaternion.Angle(objectToTrack.localRotation, Quaternion.Euler(target.rotation));
+if (angleDiff <= toleranceDegrees)
+    return true;
+
+Gimbal lock quesako ?? 2 values can mean the same thing!!
+Rotations 3D en Unity rpz souvent par des angles d'Euler (Vector3 avec x, y, z séparés)
+Pratique à lire MAIS quand un axe de rotation s'approche de 90°, les deux autres axes deviennent ambigus
+(voir tuto yt)
+si on compare x, y, z separement on pt avoir une situation ou l'objet est dans la bonne pose mais ou l'un des angles affiche une diff enorme par rapport à la cible enregistre, alors que l'orientation global est identique
+
+solution : QUATERNION : do not care about order
+objectToTrack.localRotation : la rotation actuelle de l'objet, déjà stockée en quaternion en interne par Unity
+Quaternion.Euler(target.rotation) : convertit la rotation cible (stockée comme Vector3 en degrés dans TargetTransform, pratique pour l'Inspector) en quaternion, pour pouvoir la comparer sur un pied d'égalité.
+Quaternion.Angle(a, b) : calcule l'angle de rotation le plus court nécessaire pour passer de l'orientation a à l'orientation b — un seul nombre unique, qui représente fidèlement à quel point les deux orientations sont "proches" globalement, peu importe comment cette différence se répartit entre les axes X/Y/Z individuels.
+
+*/
 public class PuzzleManager2 : MonoBehaviour
 {
     // Stores a target rotation and position the object must match to solve the puzzle
@@ -56,6 +82,7 @@ public class PuzzleManager2 : MonoBehaviour
             if (validationTimer >= validationDelay)
             {
                 isSolved = true;
+                SaveManager.Instance.MarkPuzzleSolved(2);
                 ShowSolvedPanel();
                 onPuzzleSolved.Invoke();
             }
@@ -129,7 +156,6 @@ public class PuzzleManager2 : MonoBehaviour
     {
         Debug.Log("GotToMainMenu called");
         Time.timeScale = 1f;
-        SaveManager.Instance.MarkPuzzleSolved(2);
         SaveManager.Instance.SkipToLevelSelect = true;
         SceneManager.LoadScene("MainMenu");
     }
@@ -154,8 +180,8 @@ public class PuzzleManager2 : MonoBehaviour
                 rotation = objectToTrack.localEulerAngles,
                 position = objectToTrack.localPosition
             };
-            Debug.Log("Captured local rotation: " + objectToTrack.localEulerAngles +
-                      " | local position: " + objectToTrack.localPosition);
+            //Debug.Log("Captured local rotation: " + objectToTrack.localEulerAngles +
+                      //" | local position: " + objectToTrack.localPosition);
         }
     }
     

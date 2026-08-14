@@ -1,6 +1,20 @@
 using UnityEngine;
 using System.Collections;
 
+/*
+Coroutine & IEnumerator = methode c# qui peut faire une pause
+En C# quand on appelle un méthode elle s'execute dans l'instant
+Pour faire un zoom qui dure 2 sec dans une methode normale = pas possible comme tout se passerait dans l'instant
+Coroutine = méthode spéciale qui peut dire stop je fais une pause ici et je reprendrai à ce meme endroit à la prochaine frame
+IEnumerator = étiquette qui dit à Unity cette méthode va faire des pauses
+// lire un livre d'un coup ou en prenant des pauses
+
+Lerp
+Lerp(0, 10, 0) → te donne 0 (tu es encore au départ, 0%)
+Lerp(0, 10, 0.5) → te donne 5 (tu es à mi-chemin, 50%)
+Lerp(0, 10, 1) → te donne 10 (tu es arrivé, 100%)
+*/
+
 public class CameraZoom : MonoBehaviour
 {
     [Header("Zoom Settings")]
@@ -34,29 +48,33 @@ public class CameraZoom : MonoBehaviour
         // Calculate the final camera position in front of the target
         Vector3 targetPosition = shadowTarget.position + zoomOffset;
 
-        // Calculate the rotation so the camera looks toward the target
+        // Calculate the rotation so the camera looks toward the target, géré par Unity directement
         Quaternion targetRotation = Quaternion.LookRotation(
             shadowTarget.position - targetPosition);
 
         // Trigger the letterbox black bars animation at the start of the zoom
         if (letterbox != null)
-            letterbox.StartCoroutine(letterbox.ShowBars());
+            letterbox.StartCoroutine(letterbox.ShowBars()); // lance l'animation mais continue tt de suite sans attendre qu'elle finisse // en mm temps
 
         // Animate the camera toward the target over zoomDuration seconds
         while (elapsed < zoomDuration)
         {
+            // Time.deltaTime = time since the last frame, permet à elapsed d'avancer à la meme vitesse reelle 
+            // evite que le zoom soit plus lent ou non selon le pc
             elapsed += Time.deltaTime;
-            float t = elapsed / zoomDuration;
+            float t = elapsed / zoomDuration; // flag pr savoir ou on en est
 
-            // Smooth ease in-out curve for fluid movement
+            // Smooth ease in-out curve for fluid movement sinon mvvmnt robot
             float smoothT = t * t * (3f - 2f * t);
 
             // Interpolate position, rotation and FOV between initial and final state
+            // Lerp = calculer entre 2 points ; donne un point entre A et B selon un %
+            // place la cam entre sa position de depart et sa position d'arrivée => cb de % du chemin smoothT on a deja fait
             transform.position = Vector3.Lerp(originalPosition, targetPosition, smoothT);
             transform.rotation = Quaternion.Lerp(originalRotation, targetRotation, smoothT);
             cam.fieldOfView = Mathf.Lerp(originalFOV, zoomFOV, smoothT);
 
-            yield return null;
+            yield return null; // le marque page du livre, 6O frames per sec game donc la boucle s'écute 60 fois par seconde en bougeant la camera un tt ptt peu à chaque passage
         }
 
         // Short pause to let the player admire the shadow
@@ -64,9 +82,10 @@ public class CameraZoom : MonoBehaviour
 
         // Hide the black bars before showing the victory panel
         if (letterbox != null)
-            yield return StartCoroutine(letterbox.HideBars());
+            yield return StartCoroutine(letterbox.HideBars()); // lance l'annimation et att qu'elle soit completement terminée avant de continuer
 
         // Invoke the callback → triggers the PuzzleSolvedPanel display
+        // ? fait le seulement si on m'a bien donnée une méthode 
         onComplete?.Invoke();
     }
 
@@ -86,10 +105,11 @@ public class CameraZoom : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = elapsed / (zoomDuration * 0.5f);
 
-            // Smooth ease in-out curve for fluid return
+            // Smooth ease in-out curve for fluid return ; smoothstep polynomial (3t² - 2t³)
             float smoothT = t * t * (3f - 2f * t);
 
             // Interpolate back to original position, rotation and FOV
+            // Lerp = linear interpolation
             transform.position = Vector3.Lerp(currentPos, originalPosition, smoothT);
             transform.rotation = Quaternion.Lerp(currentRot, originalRotation, smoothT);
             cam.fieldOfView = Mathf.Lerp(currentFOV, originalFOV, smoothT);

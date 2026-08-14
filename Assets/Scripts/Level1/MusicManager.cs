@@ -2,6 +2,11 @@ using UnityEngine;
 using UnityEngine.Audio;
 using System.Collections;
 
+/*
+AudioMixer = outil Unity mixer/modif son en temps réel
+lowPassParam = "LowPassCutoff" = le nom (en texte) d'un réglage précis à l'intérieur de ce mixer. Un filtre "low pass" (passe-bas) est un effet audio qui coupe les sons aigus et ne laisse passer que les graves
+Au lancement de la scène, le son est étouffé (800). Quand le joueur résout un puzzle, RemoveWindEffect() est appelée, ce qui lance une transition douce de 2 secondes qui fait remonter progressivement la fréquence jusqu'à 22000, donnant l'impression que la musique "se révèle" clairement — un petit effet sonore qui accompagne visuellement/auditivement la satisfaction d'avoir résolu le puzzle
+*/
 public class MusicManager : MonoBehaviour
 {
     [Header("Audio")]
@@ -13,9 +18,11 @@ public class MusicManager : MonoBehaviour
     public float clearFrequency = 22000f;       // low pass cutoff frequency without effect (clear)
     public float transitionDuration = 2f;       // duration of the transition in seconds
 
-    void Start()
+    // on applique l'effet dès le lancement ; 
+    void Start() 
     {
         // Start with the wind/muffled effect applied
+        // SetFloat(nom, valeur) = méthode native d'Unity qui dit : "va chercher le réglage qui s'appelle lowPassParam (donc "LowPassCutoff") dans le mixer, et donne-lui la valeur windFrequency".
         audioMixer.SetFloat(lowPassParam, windFrequency);
     }
 

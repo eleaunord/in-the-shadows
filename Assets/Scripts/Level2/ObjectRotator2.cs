@@ -9,9 +9,8 @@ public class ObjectRotator2 : MonoBehaviour
 
     // private
     private bool isDragging = false; // is the mouse slidding? 
-    private bool wasPressed = false; // click state at previous frame
     private float lastMouseX; 
-    private float lastMouseY;
+    private float lastMouseY; // en plus pr ce niveau
     private Renderer cachedRenderer; // stock the renderer so we do not have to look for it at each frame
 
     void Start()
@@ -22,28 +21,30 @@ public class ObjectRotator2 : MonoBehaviour
 
     void Update()
     {
-        bool isPressed = Mouse.current.leftButton.isPressed;
-
-        if (isPressed && !wasPressed) // we just clicked
+        if (Mouse.current.leftButton.wasPressedThisFrame) // we just clicked
         {
             isDragging = true;
             lastMouseX = Mouse.current.position.x.ReadValue();
             lastMouseY = Mouse.current.position.y.ReadValue();
         }
-        if (!isPressed && wasPressed) // we just realeased
-            isDragging = false;
 
-        wasPressed = isPressed; // saving current state for next frame
+        if (Mouse.current.leftButton.wasReleasedThisFrame) // we just released
+        {
+            isDragging = false;
+        }
 
         if (isDragging && cachedRenderer != null)
         {
             float currentMouseX = Mouse.current.position.x.ReadValue(); // horizontal movement
             float currentMouseY = Mouse.current.position.y.ReadValue(); // vertical movement
+            
+            //déplacement de la souris depuis la dernière frame, sur les deux axes cette fois (horizontal et vertical)
             float deltaX = currentMouseX - lastMouseX;
             float deltaY = currentMouseY - lastMouseY;
 
             Vector3 center = cachedRenderer.bounds.center; // center of the 3D mesh
 
+            // lit l'état de la touche CTRL via le nouveau Input System
             bool isCtrlHeld = Keyboard.current.ctrlKey.isPressed;
 
             if (isCtrlHeld)

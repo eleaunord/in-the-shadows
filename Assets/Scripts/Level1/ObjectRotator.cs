@@ -11,16 +11,19 @@ public class ObjectRotator : MonoBehaviour
     void Start()
     {
         // Automatically calculate the visual center of the object using its renderers
+       
+        // recupère tous les composants renderer (morceaux visibles, maillages) présents sur cet objet et ses enfants
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         if (renderers.Length > 0)
         {
             // Expand bounds to encapsulate all child renderers
-            Bounds bounds = renderers[0].bounds;
+            // = boite englobante qui contient tt la mesh
+            Bounds bounds = renderers[0].bounds; // demarre avec la boite du premier trouvé
             foreach (Renderer r in renderers)
-                bounds.Encapsulate(r.bounds);
+                bounds.Encapsulate(r.bounds); // agrandit la boite pour qu'elle englobe aussi les autres meshes
 
             // Use the center of the combined bounds as the pivot point
-            pivotPoint = bounds.center;
+            pivotPoint = bounds.center; // centre geometrique de la boite 
         }
         else
         {
@@ -53,6 +56,9 @@ public class ObjectRotator : MonoBehaviour
             float deltaX = currentMouseX - lastMouseX;
 
             // Rotate around the object's visual center on the Y axis (horizontal rotation)
+            // et non rotate sinon ca risque de faire tourner autour de l'origine du monde
+            // Vector3.up = axe y
+            //deltaX = currentMouseX - lastMouseX = de combien la souris a bougé horizontalement depuis la dernière frame
             transform.RotateAround(pivotPoint, Vector3.up, -deltaX * rotationSpeed);
 
             // Save current mouse position for next frame

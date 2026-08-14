@@ -29,6 +29,8 @@ public class PuzzleManager3 : MonoBehaviour
         public Transform objectToTrack;  // the object the player manipulates
     }
 
+    // From TargetTransform[] targets -> List<T>
+    // gonna be more solutions so might as well not use a table with a fixed size and use a list with a dynamic size
     [Header("Puzzle Setup")]
     public List<TrackedPart> trackedParts = new List<TrackedPart>(); // master list of all parts
     public List<Solution> solutions = new List<Solution>();           // all valid full-pose solutions
@@ -79,7 +81,7 @@ public class PuzzleManager3 : MonoBehaviour
 
         int matched = FindMatchingSolutionIndex();
 
-        // LOG TEMPORAIRE — which solution is currently aligned (or none)
+        // LOG TEMPORAIRE — which solution is currently aligned (or none) : si matched >= 0 est vrai prends matched.ToString() sinon prend none
         Debug.Log("Currently matching solution: " + (matched >= 0 ? matched.ToString() : "none"));
 
         if (matched >= 0)
@@ -87,6 +89,11 @@ public class PuzzleManager3 : MonoBehaviour
             // LOG TEMPORAIRE — per-part detail for the matched solution
             LogSolutionMatch(matched);
 
+
+            // NB: le joueur doit maintenir la bonne pise pdt 1 sec complete (validationDelay) avant de valider le puzzle
+            // validationTimer compte ce delai
+            // est ce que le joueur est en train de maintenir la meme solution depuis un moment ou est ce qu'il vient de changer de solution??
+            // il faut eviter que le joeur passe d'une solution à une autre en cours de route
             if (matched != lastMatchedSolutionIndex)
             {
                 // A different solution started matching: reset the timer before counting this frame
@@ -101,6 +108,7 @@ public class PuzzleManager3 : MonoBehaviour
             if (validationTimer >= validationDelay)
             {
                 isSolved = true;
+                SaveManager.Instance.MarkPuzzleSolved(3);
                 DisableAllRotators();
                 ShowSolvedPanel();
                 onPuzzleSolved.Invoke();
@@ -129,17 +137,20 @@ public class PuzzleManager3 : MonoBehaviour
             bool allMatch = true;
             for (int i = 0; i < trackedParts.Count; i++)
             {
+                // check si la reference au pivot a bien été rentré dans l'inspector
                 if (trackedParts[i].objectToTrack == null) { allMatch = false; break; }
+
+                // dès qu'on croise une partie qui ne match pas on sort de notre condition optimiste
                 if (!IsPartAlignedToTarget(trackedParts[i].objectToTrack, sol.partTargets[i]))
                 {
                     allMatch = false;
                     break; // stop checking this solution as soon as one part fails
                 }
             }
-
+            // si tt les parties correspondent => on renvoie l'index de cette solution et on stop la recherche
             if (allMatch) return s;
         }
-
+        // boo on a pas la solution
         return -1;
     }
 
@@ -153,6 +164,8 @@ public class PuzzleManager3 : MonoBehaviour
         float angleDiff = Quaternion.Angle(currentRot, targetRot);
         bool rotationOk = angleDiff <= toleranceDegrees;
 
+        // Vector3.Distance(a,b) = theoreme de pythagore 3D, calcule la distance en ligne droite entre 2 points dans l'espace
+        // verification de la position en + de la rotation
         float distPos = Vector3.Distance(obj.localPosition, target.targetPosition);
         bool positionOk = distPos <= tolerancePosition;
 
@@ -310,7 +323,6 @@ public class PuzzleManager3 : MonoBehaviour
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
-        SaveManager.Instance.MarkPuzzleSolved(3);
         SaveManager.Instance.SkipToLevelSelect = true;
         SceneManager.LoadScene("MainMenu");
     }

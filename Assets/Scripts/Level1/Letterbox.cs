@@ -28,15 +28,17 @@ public class Letterbox : MonoBehaviour
         // Animate scale from 0 to 1 on Y axis to slide bars in
         while (elapsed < animDuration)
         {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / animDuration);
-            float scale = Mathf.Lerp(0f, 1f, t);
+            elapsed += Time.deltaTime; // compte le temps qui passe, frame ap frame
+            float t = Mathf.Clamp01(elapsed / animDuration); // ou on en est 
+            float scale = Mathf.Lerp(0f, 1f, t); // force t à rester entre 0 et 1, pas d'a coup à la fin
+            // controle de la taille d'un objet sur 3 axes (largeur, hauteur, profondeur)
             top.localScale = new Vector3(1, scale, 1);
             bot.localScale = new Vector3(1, scale, 1);
             yield return null;
         }
 
-        // Ensure bars are fully visible at the end
+        // Ensure bars are fully visible at the end en forcant la taille à être exactement (1,1,1)
+        // garantit que l'anim se termine pile à la taille normale 
         top.localScale = Vector3.one;
         bot.localScale = Vector3.one;
     }
@@ -47,7 +49,7 @@ public class Letterbox : MonoBehaviour
         RectTransform top = topBar.GetComponent<RectTransform>();
         RectTransform bot = bottomBar.GetComponent<RectTransform>();
 
-        float elapsed = 0f;
+        float elapsed = 0f; // fait disparaitre les barres en retrecissant
 
         // Animate scale from 1 to 0 on Y axis to slide bars out
         while (elapsed < animDuration)

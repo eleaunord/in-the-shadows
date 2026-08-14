@@ -7,7 +7,7 @@ using System.Collections;
 public class PuzzleManager : MonoBehaviour
 {
     // Stores a target rotation and position the object must match to solve the puzzle
-    [System.Serializable]
+    [System.Serializable] // attribut unity pour que la classe s'affiche et se modifie direct ds inspector
     public class TargetTransform
     {
         public Vector3 rotation;
@@ -27,6 +27,7 @@ public class PuzzleManager : MonoBehaviour
     [Header("Cinematic")]
     public CameraZoom cameraZoom;           // handles the zoom cinematic on solve
 
+    // UnityEvent = permet de brancher des methodes direct dans inspector sans code ; quelle action supp faire au moment de la resolution
     [Header("Events")]
     public UnityEvent onPuzzleSolved;       // Unity event triggered when puzzle is solved
 
@@ -44,8 +45,10 @@ public class PuzzleManager : MonoBehaviour
     void Update()
     {
         // Do nothing if already solved or no object to track
-        if (isSolved) return;
-        if (objectToTrack == null) return;
+        if (isSolved)
+            return;
+        if (objectToTrack == null)
+            return;
 
         if (IsTransformClose())
         {
@@ -56,6 +59,7 @@ public class PuzzleManager : MonoBehaviour
             if (validationTimer >= validationDelay)
             {
                 isSolved = true;
+                SaveManager.Instance.MarkPuzzleSolved(1);
                 ShowSolvedPanel();
                 onPuzzleSolved.Invoke();
             }
@@ -73,9 +77,11 @@ public class PuzzleManager : MonoBehaviour
         foreach (TargetTransform target in targets)
         {
             // Level 1 : only check Y rotation (horizontal rotation only)
+            // Mathf.DeltaAngle(a, b) calcule la différence angulaire la plus courte entre deux angles
             float diffY = Mathf.Abs(Mathf.DeltaAngle(
                 objectToTrack.localEulerAngles.y, target.rotation.y));
 
+            //diffY <= toleranceDegrees vérifie que cet écart reste dans la marge tolérée.
             bool rotationOk = diffY <= toleranceDegrees;
 
             if (rotationOk)
@@ -129,9 +135,7 @@ public class PuzzleManager : MonoBehaviour
     {
         Debug.Log("gotomain menu called");
         Time.timeScale = 1f;
-        SaveManager.Instance.MarkPuzzleSolved(1);
-         
-        SaveManager.Instance.SkipToLevelSelect = true;
+        SaveManager.Instance.SkipToLevelSelect = true; // pr pas repasser par l'écran titre
    
         SceneManager.LoadScene("MainMenu");
     }
@@ -156,8 +160,8 @@ public class PuzzleManager : MonoBehaviour
                 rotation = objectToTrack.localEulerAngles,
                 position = objectToTrack.localPosition
             };
-            Debug.Log("Captured local rotation: " + objectToTrack.localEulerAngles +
-                      " | local position: " + objectToTrack.localPosition);
+            //Debug.Log("Captured local rotation: " + objectToTrack.localEulerAngles +
+                      //" | local position: " + objectToTrack.localPosition);
         }
     }
 }

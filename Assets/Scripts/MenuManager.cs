@@ -1,5 +1,17 @@
 using UnityEngine;
 
+/*
+MenuManager.cs gère navigation entre écran titre et écran de sélection niveau + Normal/Test mode
+On a 2 panels gérés en show/hide : titlePanel + levelSelectPanel
+tableau puzzleButtons 
+cycle de vie : start() on décide de quel panel on affiche au lancement
+
+MonoBehavior => permet à Unity d'executer le script
+-> permet d'accéder à des méthodes appeles automatiquement par Unity comme start()
+-> propriétés comme enable, gameObject
+
+*/
+
 public class MenuManager : MonoBehaviour
 {
     [Header("Panels")]
@@ -9,9 +21,13 @@ public class MenuManager : MonoBehaviour
     [Header("Puzzle buttons (index 0 = Puzzle 1)")]
     [SerializeField] private PuzzleButtonUI[] puzzleButtons;
 
+    private bool _hasStarted = false;
+
     private void OnEnable()
     {
-        if (levelSelectPanel != null && levelSelectPanel.activeSelf)
+        // Ignore le tout premier OnEnable() du chargement de scène : Start() s'en
+        // charge juste après et c'est lui qui doit consommer le flag "justUnlocked".
+        if (_hasStarted && levelSelectPanel != null && levelSelectPanel.activeSelf)
         {
             RefreshPuzzleButtons();
         }
@@ -19,6 +35,7 @@ public class MenuManager : MonoBehaviour
 
     private void Start()
     {
+        _hasStarted = true;
 
         if (SaveManager.Instance.SkipToLevelSelect)
         {
@@ -55,8 +72,8 @@ public class MenuManager : MonoBehaviour
 
     private void ShowTitlePanel()
     {
-        titlePanel.SetActive(true);
-        levelSelectPanel.SetActive(false);
+        titlePanel.SetActive(true); // le gameobject (et ses enfants) redevient actif, s'affiche à l'écran, ses scripts recoivent à nouveau Update()
+        levelSelectPanel.SetActive(false); // game object des
     }
 
     private void ShowLevelSelectPanel()
@@ -69,6 +86,10 @@ public class MenuManager : MonoBehaviour
     private void RefreshPuzzleButtons()
     {
         bool testMode = SaveManager.Instance.IsTestMode;
+
+        // Consommé une seule fois par refresh : le puzzle qui vient d'être débloqué
+        // cette session (ou null si aucun / déjà consommé / mode test).
+        int? justUnlockedIndex = testMode ? null : SaveManager.Instance.ConsumeNewlyUnlockedPuzzle();
 
         for (int i = 0; i < puzzleButtons.Length; i++)
         {
@@ -89,7 +110,8 @@ public class MenuManager : MonoBehaviour
                 solved = SaveManager.Instance.IsPuzzleSolved(puzzleIndex);
             }
 
-            puzzleButtons[i].Setup(puzzleIndex, unlocked, solved);
+            bool justUnlocked = justUnlockedIndex.HasValue && justUnlockedIndex.Value == puzzleIndex;
+            puzzleButtons[i].Setup(puzzleIndex, unlocked, solved, justUnlocked); // puzzlebuttonui.cs
         }
     }
 }
