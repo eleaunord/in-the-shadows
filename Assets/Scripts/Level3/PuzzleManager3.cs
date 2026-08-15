@@ -27,6 +27,8 @@ public class PuzzleManager3 : MonoBehaviour
     public class TrackedPart
     {
         public Transform objectToTrack;  // the object the player manipulates
+        public float rotationToleranceOverride = -1f; // per-part rotation tolerance (degrees); -1 = use the manager's global toleranceDegrees
+        public float positionToleranceOverride = -1f; // per-part position tolerance; -1 = use the manager's global tolerancePosition
     }
 
     // From TargetTransform[] targets -> List<T>
@@ -141,7 +143,7 @@ public class PuzzleManager3 : MonoBehaviour
                 if (trackedParts[i].objectToTrack == null) { allMatch = false; break; }
 
                 // dès qu'on croise une partie qui ne match pas on sort de notre condition optimiste
-                if (!IsPartAlignedToTarget(trackedParts[i].objectToTrack, sol.partTargets[i]))
+                if (!IsPartAlignedToTarget(trackedParts[i], sol.partTargets[i]))
                 {
                     allMatch = false;
                     break; // stop checking this solution as soon as one part fails
@@ -157,19 +159,32 @@ public class PuzzleManager3 : MonoBehaviour
     // Checks rotation (as a single 3D angular difference, immune to Euler-angle
     // decomposition ambiguity near gimbal lock) and position distance for one part
     // against one target
-    private bool IsPartAlignedToTarget(Transform obj, PartTarget target)
+    private bool IsPartAlignedToTarget(TrackedPart part, PartTarget target)
     {
+        Transform obj = part.objectToTrack;
         Quaternion currentRot = obj.localRotation;
         Quaternion targetRot = Quaternion.Euler(target.targetRotation);
         float angleDiff = Quaternion.Angle(currentRot, targetRot);
-        bool rotationOk = angleDiff <= toleranceDegrees;
+        bool rotationOk = angleDiff <= GetRotationTolerance(part);
 
         // Vector3.Distance(a,b) = theoreme de pythagore 3D, calcule la distance en ligne droite entre 2 points dans l'espace
         // verification de la position en + de la rotation
         float distPos = Vector3.Distance(obj.localPosition, target.targetPosition);
-        bool positionOk = distPos <= tolerancePosition;
+        bool positionOk = distPos <= GetPositionTolerance(part);
 
         return rotationOk && positionOk;
+    }
+
+    // Returns this part's rotation tolerance override if set (>= 0), else the manager's global toleranceDegrees
+    private float GetRotationTolerance(TrackedPart part)
+    {
+        return part.rotationToleranceOverride >= 0f ? part.rotationToleranceOverride : toleranceDegrees;
+    }
+
+    // Returns this part's position tolerance override if set (>= 0), else the manager's global tolerancePosition
+    private float GetPositionTolerance(TrackedPart part)
+    {
+        return part.positionToleranceOverride >= 0f ? part.positionToleranceOverride : tolerancePosition;
     }
 
     // LOG TEMPORAIRE — logs per-part detail for a matched solution
@@ -194,10 +209,10 @@ public class PuzzleManager3 : MonoBehaviour
             Quaternion currentRot = obj.localRotation;
             Quaternion targetRot = Quaternion.Euler(target.targetRotation);
             float angleDiff = Quaternion.Angle(currentRot, targetRot);
-            bool rotationOk = angleDiff <= toleranceDegrees;
+            bool rotationOk = angleDiff <= GetRotationTolerance(trackedParts[i]);
 
             float distPos = Vector3.Distance(obj.localPosition, target.targetPosition);
-            bool positionOk = distPos <= tolerancePosition;
+            bool positionOk = distPos <= GetPositionTolerance(trackedParts[i]);
 
             Debug.Log("[Sol " + solutionIndex + "] " + obj.name +
                       " | rotAngleDiff: " + angleDiff.ToString("F1") +
@@ -242,10 +257,10 @@ public class PuzzleManager3 : MonoBehaviour
                 Quaternion currentRot = obj.localRotation;
                 Quaternion targetRot = Quaternion.Euler(target.targetRotation);
                 float angleDiff = Quaternion.Angle(currentRot, targetRot);
-                bool okAngle = angleDiff <= toleranceDegrees;
+                bool okAngle = angleDiff <= GetRotationTolerance(trackedParts[i]);
 
                 float distPos = Vector3.Distance(obj.localPosition, target.targetPosition);
-                bool okPos = distPos <= tolerancePosition;
+                bool okPos = distPos <= GetPositionTolerance(trackedParts[i]);
 
                 solutionScore += angleDiff + distPos;
 

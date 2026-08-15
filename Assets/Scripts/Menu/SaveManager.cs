@@ -1,16 +1,34 @@
 using UnityEngine;
 
 /*
+
+le pattern Singleton : garantir qu'une classe n'a jamais qu'une seule instance dans tout le programme et donner un moyen simple d'y accéder partout
+
+Normalement en C#, tu peux créer autant d'instances d'une classe que tu veux :
+
+SaveManager sm1 = new SaveManager();
+SaveManager sm2 = new SaveManager();
+SaveManager sm3 = new SaveManager();
+
+3 objets diff avec ses propres données en mémoire. Mais parfois pas de sens d'en avoir plusieurs : pas de sens d'avoir plusieurs save manager vu qu'on veut 
+qu'une sauvegarde de progression, same pour le gestionnaire audio
+
+ATTENTION aux dépendances cachées
+
 Progression des puzzles (résolu ou non), stockée de facon persistante avec PlayerPrefs (systeme de sauvegarde simple d'unity)
+
 PlayerPrefs = API native d'Unity pour sauvegarder de petites données clé-valeur sur le disque, persistantes même après fermeture du jeu
 Mode test vs normal : istesmode gardé en mémoire
 déblocage progressif
+
 */
 public class SaveManager : MonoBehaviour
 {
+
+    // reference statique unique, une seule variable _instance existe partage par tous
     private static SaveManager _instance;
 
-    // s'éxecute à chaque fois qu'on lit dans SaveManager.Instance
+    // s'éxecute à chaque fois qu'on lit dans SaveManager.Instance, point d'acces public unique qui controle la creation
     public static SaveManager Instance // référence statique globale : permet d'écrire instance depuis n'importe quel script 
     {
         get
@@ -23,11 +41,15 @@ public class SaveManager : MonoBehaviour
                 DontDestroyOnLoad(go); // le rend persistent
             }
             return _instance;
+
+            // lazy singleton = l'objet est crée qu'au moment où on en a vrmnt besoin pour la 1er fois
         }
     }
 
     public bool SkipToLevelSelect { get; set; } = false;
     /*
+    Auto propriété avec valeur par défaut 
+
     private bool _skipToLevelSelect = false; 
     public bool SkipToLevelSelect
     {
@@ -53,16 +75,22 @@ public class SaveManager : MonoBehaviour
         Debug.Log("Save data reset.");
     }
 
+    /*
+    Awake() méthode de cycle de vie Unity, appelé avant Start() dès qu'un objet est instancié 
+    Si un savemanager est placé manuellement dans une scène par erreur (glissé dans inspecteor) en plus de celui qui est créer automatiquemnt
+    = PBLM ; besoin d'une verif en plus pour pas se retrouver avec deux instances qui se marchent dessus
+    */
+
     // sécurité complementaire pour que instance soit persistent
     private void Awake()
     {
         if (_instance != null && _instance != this) // evite doublon
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // si une autre instance existe, elle se détruit elle meme
             return;
         }
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
+        _instance = this; // si pas d'autre instance, on enregistre l'instance commme la ref officielle
+        DontDestroyOnLoad(gameObject); // et on la rend persistente
     }
 
     public void SetTestMode(bool value)
@@ -72,6 +100,8 @@ public class SaveManager : MonoBehaviour
 
     public bool IsPuzzleSolved(int puzzleIndex)
     {
+        // Getint comme PlayerPrefs ne peut pas stocker de bool 
+
         bool result = PlayerPrefs.GetInt(SOLVED_KEY_PREFIX + puzzleIndex, 0) == 1;
         //Debug.Log($"[SaveManager] IsPuzzleSolved({puzzleIndex}) = {result}");
         // Debug.Log("[SaveManager] IsPuzzleSolved(" + puzzleIndex + ") = " + result);
@@ -81,9 +111,14 @@ public class SaveManager : MonoBehaviour
     public void MarkPuzzleSolved(int puzzleIndex)
     {
         //Debug.Log($"[SaveManager] MarkPuzzleSolved({puzzleIndex}) appelé");
+
+        // PERSISTENT
+
         //PlayerPrefs.SetInt(clé, valeur)
         PlayerPrefs.SetInt(SOLVED_KEY_PREFIX + puzzleIndex, 1);
         PlayerPrefs.Save();
+
+        // TRANSITOIRE (pr l'anim)
 
         int nextIndex = puzzleIndex + 1;
         if (nextIndex <= TOTAL_PUZZLES)

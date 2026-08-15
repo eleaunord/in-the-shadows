@@ -1657,9 +1657,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleManager3
   trackedParts:
   - objectToTrack: {fileID: 1177648837}
+    rotationToleranceOverride: 20
+    positionToleranceOverride: -1
   - objectToTrack: {fileID: 566660758}
+    rotationToleranceOverride: -1
+    positionToleranceOverride: -1
   - objectToTrack: {fileID: 881762242}
+    rotationToleranceOverride: -1
+    positionToleranceOverride: -1
   - objectToTrack: {fileID: 1035948542}
+    rotationToleranceOverride: -1
+    positionToleranceOverride: -1
   solutions:
   - partTargets:
     - targetRotation: {x: 9.991, y: -174.764, z: 2.725}
