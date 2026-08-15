@@ -18,6 +18,7 @@ public class MusicManager : MonoBehaviour
     public float clearFrequency = 22000f;       // low pass cutoff frequency without effect (clear)
     public float transitionDuration = 2f;       // duration of the transition in seconds
 
+
     // on applique l'effet dès le lancement ; 
     void Start() 
     {
@@ -25,6 +26,7 @@ public class MusicManager : MonoBehaviour
         // SetFloat(nom, valeur) = méthode native d'Unity qui dit : "va chercher le réglage qui s'appelle lowPassParam (donc "LowPassCutoff") dans le mixer, et donne-lui la valeur windFrequency".
         audioMixer.SetFloat(lowPassParam, windFrequency);
     }
+
 
     // Called when the puzzle is solved to smoothly remove the wind effect
     public void RemoveWindEffect()

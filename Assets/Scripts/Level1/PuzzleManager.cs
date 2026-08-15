@@ -60,6 +60,7 @@ public class PuzzleManager : MonoBehaviour
             {
                 isSolved = true;
                 SaveManager.Instance.MarkPuzzleSolved(1);
+                DisableAllRotators();
                 ShowSolvedPanel();
                 onPuzzleSolved.Invoke();
             }
@@ -88,6 +89,15 @@ public class PuzzleManager : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    // Disables ObjectRotator on the tracked object (checks pivot parents) so the player can no longer move it after solving
+    private void DisableAllRotators()
+    {
+        if (objectToTrack == null) return;
+        ObjectRotator rotator = objectToTrack.GetComponentInParent<ObjectRotator>();
+        if (rotator != null)
+            rotator.enabled = false;
     }
 
     // Triggers the cinematic then shows the solved panel

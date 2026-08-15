@@ -18,9 +18,9 @@ public class PuzzleButtonUI : MonoBehaviour
     [SerializeField] private string puzzleClueName;
 
     [Header("Animation")]
-    [SerializeField] private float unlockFadeDuration = 2f;
-    [SerializeField] private int highlightPulseCount = 3;
-    [SerializeField] private float highlightPulseInterval = 3f;
+    [SerializeField] private float unlockFadeDuration = 0.5f;
+    [SerializeField] private int highlightPulseCount = 2;
+    [SerializeField] private float highlightPulseInterval = 0.25f;
 
     public void Setup(int puzzleIndex, bool unlocked, bool solved, bool justUnlocked = false)
     {
@@ -84,6 +84,7 @@ public class PuzzleButtonUI : MonoBehaviour
     // pour laisser le Sprite Swap natif du Button reprendre la main normalement.
     private IEnumerator PlayHighlightPulse()
     {
+        SFXManager.Instance.PlaySFX(SFXManager.Instance.unlockClip);
         Image backgroundImage = button.targetGraphic as Image;
         Sprite highlightedSprite = button.spriteState.highlightedSprite;
         if (backgroundImage == null || highlightedSprite == null) yield break;
