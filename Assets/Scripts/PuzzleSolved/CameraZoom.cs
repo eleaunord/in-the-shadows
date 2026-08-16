@@ -13,6 +13,7 @@ Lerp
 Lerp(0, 10, 0) → te donne 0 (tu es encore au départ, 0%)
 Lerp(0, 10, 0.5) → te donne 5 (tu es à mi-chemin, 50%)
 Lerp(0, 10, 1) → te donne 10 (tu es arrivé, 100%)
+
 */
 
 public class CameraZoom : MonoBehaviour
@@ -74,7 +75,7 @@ public class CameraZoom : MonoBehaviour
             transform.rotation = Quaternion.Lerp(originalRotation, targetRotation, smoothT);
             cam.fieldOfView = Mathf.Lerp(originalFOV, zoomFOV, smoothT);
 
-            yield return null; // le marque page du livre, 6O frames per sec game donc la boucle s'écute 60 fois par seconde en bougeant la camera un tt ptt peu à chaque passage
+            yield return null; // le marque page du livre, 6O frames per sec game donc la boucle s'écxecute 60 fois par seconde en bougeant la camera un tt ptt peu à chaque passage
         }
 
         // Short pause to let the player admire the shadow

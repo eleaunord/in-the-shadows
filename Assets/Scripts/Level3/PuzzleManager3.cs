@@ -5,6 +5,10 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
+/*
+-1f sert de valeur sentinelle — une valeur normalement impossible dans ce contexte (une tolérance ne peut pas être négative) utilisée comme code spécial pour dire "pas de valeur personnalisée ici".
+
+*/
 public class PuzzleManager3 : MonoBehaviour
 {
     // Target transform for one part within a solution
@@ -16,6 +20,7 @@ public class PuzzleManager3 : MonoBehaviour
     }
 
     // A complete set of target transforms covering all tracked parts at once
+    // liste au lieu d'un tableau comme BCP de solutions possible
     [System.Serializable]
     public class Solution
     {
@@ -307,7 +312,8 @@ public class PuzzleManager3 : MonoBehaviour
     private IEnumerator PlayCinematicThenShow()
     {
         // Start the music transition immediately when the puzzle is solved
-        musicManager?.RemoveWindEffect();
+        if (musicManager != null)
+            musicManager.RemoveWindEffect();
 
         if (cameraZoom != null)
         {
@@ -329,7 +335,8 @@ public class PuzzleManager3 : MonoBehaviour
             if (puzzleSolvedPanel != null)
             {
                 puzzleSolvedPanel.SetActive(true);
-                solvedText?.SetText(solvedMessage);
+                if (solvedText != null)
+                    solvedText.text = solvedMessage;
             }
         }
     }

@@ -1,6 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/*
+Cache : optimisation vs calcul à chaque frame
+
+ObjectRotator (niveau 1) : calcule du pivotPoint une seule fois dans Start() via Bounds.Encapsulate
+puis stockage dans un Vector3
+
+ObjectRotator2 (niveau 2) : stock la reference vers le composant (cachedRenderer), puis on recalcules son centre à chaque frame dans Update()
+référence vers le composant — c'est-à-dire "où se trouve le Renderer". GetComponentInChildren<Renderer>() fait un parcours de la hiérarchie du GameObject pour le trouver — une opération relativement coûteuse si elle est répétée à chaque frame, mais dont le résultat (le composant lui-même) ne change jamais pendant toute la vie de l'objet. Un objet ne change pas de Renderer en cours de partie. Donc chercher une fois, garder la référence, c'est logique : la réponse à "quel est ton Renderer ?" est une donnée stable.
+// adresse d'un ami
+vs bounds.center ou se trouve ton ami a un instant précis
+
+*/
 public class ObjectRotator2 : MonoBehaviour
 {
 
@@ -33,6 +45,7 @@ public class ObjectRotator2 : MonoBehaviour
             isDragging = false;
         }
 
+
         if (isDragging && cachedRenderer != null)
         {
             float currentMouseX = Mouse.current.position.x.ReadValue(); // horizontal movement
@@ -45,7 +58,7 @@ public class ObjectRotator2 : MonoBehaviour
             Vector3 center = cachedRenderer.bounds.center; // center of the 3D mesh
 
             // lit l'état de la touche CTRL via le nouveau Input System
-            bool isCtrlHeld = Keyboard.current.ctrlKey.isPressed;
+            bool isCtrlHeld = Keyboard.current != null && Keyboard.current.ctrlKey.isPressed;
 
             if (isCtrlHeld)
                 // CTRL + drag = vertical rotation (around x axis)

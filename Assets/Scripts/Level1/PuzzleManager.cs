@@ -4,10 +4,19 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 
+/*
+Time.timeScale contrôle la vitesse globale du temps dans le jeu
+1f = vitesse normale
+Of = jeu en pause
+0.5f = ralenti
+
+*/
 public class PuzzleManager : MonoBehaviour
 {
     // Stores a target rotation and position the object must match to solve the puzzle
     [System.Serializable] // attribut unity pour que la classe s'affiche et se modifie direct ds inspector
+    
+    // classe imbriquée
     public class TargetTransform
     {
         public Vector3 rotation;
@@ -62,7 +71,10 @@ public class PuzzleManager : MonoBehaviour
                 SaveManager.Instance.MarkPuzzleSolved(1);
                 DisableAllRotators();
                 ShowSolvedPanel();
-                onPuzzleSolved.Invoke();
+
+                // décelnche tt les actions branchées dessus ds l'inspecteur au moment choisi dans le code 
+                onPuzzleSolved.Invoke(); // equivalent d'un addlistener mais configuré dans l'inspecteur
+                
             }
         }
         else
@@ -95,7 +107,8 @@ public class PuzzleManager : MonoBehaviour
     private void DisableAllRotators()
     {
         if (objectToTrack == null) return;
-        ObjectRotator rotator = objectToTrack.GetComponentInParent<ObjectRotator>();
+        // symetrique de GetComponentsInChildren mais on cherche vers le haut vu que c le parent qui a le pivot
+        ObjectRotator rotator = objectToTrack.GetComponentInParent<ObjectRotator>(); // le script existe tjrs mais on desactive son update
         if (rotator != null)
             rotator.enabled = false;
     }
@@ -115,6 +128,7 @@ public class PuzzleManager : MonoBehaviour
 
         if (cameraZoom != null)
         {
+            // FONCTION ANONYME (cf CameraZoom.cs)
             // Wait for the zoom cinematic to finish before showing the panel
             yield return StartCoroutine(cameraZoom.ZoomToShadow(() =>
             {
@@ -144,6 +158,8 @@ public class PuzzleManager : MonoBehaviour
     public void GoToMainMenu()
     {
         Debug.Log("gotomain menu called");
+        
+        // garantit que quand on repart au menu le temps n'est pas bloqué
         Time.timeScale = 1f;
         SaveManager.Instance.SkipToLevelSelect = true; // pr pas repasser par l'écran titre
    
@@ -156,6 +172,8 @@ public class PuzzleManager : MonoBehaviour
         Debug.Log("Quit!");
         Application.Quit();
     }
+
+    // DEBUGISH
 
     // Editor utility : right click the script in the Inspector to capture the current transform as a target
     [ContextMenu("Capture Current Transform As Target")]

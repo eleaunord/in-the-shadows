@@ -29,7 +29,7 @@ public class Letterbox : MonoBehaviour
         while (elapsed < animDuration)
         {
             elapsed += Time.deltaTime; // compte le temps qui passe, frame ap frame
-            float t = Mathf.Clamp01(elapsed / animDuration); // ou on en est 
+            float t = Mathf.Clamp01(elapsed / animDuration); // où on en est 
             float scale = Mathf.Lerp(0f, 1f, t); // force t à rester entre 0 et 1, pas d'a coup à la fin
             // controle de la taille d'un objet sur 3 axes (largeur, hauteur, profondeur)
             top.localScale = new Vector3(1, scale, 1);

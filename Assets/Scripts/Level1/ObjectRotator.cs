@@ -1,6 +1,17 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/*
+Bounds = type Unity qui rpz une boîte englobante alignée sur les axes
+
+Mouse.current = nouvel Input System (le nouveau GetMouseButtonDown(0))
+=> réference statique vers la souris actuellement active
+.leftButton : le bouton gauche 
+.wasPressedThisFrame : true seulement pendant la frame exacte où le clic vient d'arriver (pas à chaque frame tant qu'il reste appuyé).
+.wasReleasedThisFrame : symétrique, true seulement à la frame du relâchement.
+.position est ce qu'on appelle une InputAction ou valeur d'entrée composite (un Vector2 représentant x et y de la souris à l'écran). .x en extrait la composante horizontale, et 
+.ReadValue() est la méthode qui lit effectivement la valeur actuelle à cet instant
+*/
 public class ObjectRotator : MonoBehaviour
 {
     public float rotationSpeed = 0.3f;      // rotation speed multiplier
@@ -12,6 +23,7 @@ public class ObjectRotator : MonoBehaviour
     {
         // Automatically calculate the visual center of the object using its renderers
        
+       // GEOMETRIE 3D
         // recupère tous les composants renderer (morceaux visibles, maillages) présents sur cet objet et ses enfants
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         if (renderers.Length > 0)
@@ -57,7 +69,7 @@ public class ObjectRotator : MonoBehaviour
 
             // Rotate around the object's visual center on the Y axis (horizontal rotation)
             // et non rotate sinon ca risque de faire tourner autour de l'origine du monde
-            // Vector3.up = axe y
+            // Vector3.up = axe y (racourcie de new Vector3(0,1,0))
             //deltaX = currentMouseX - lastMouseX = de combien la souris a bougé horizontalement depuis la dernière frame
             transform.RotateAround(pivotPoint, Vector3.up, -deltaX * rotationSpeed);
 

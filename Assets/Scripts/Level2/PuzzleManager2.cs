@@ -5,6 +5,7 @@ using TMPro;
 using System.Collections;
 
 /*
+
 Gros chgmnt avec PuzzleManager.cs : IsTransformClose()
 
 Mathf.DeltaAngle -> Quaternion.Angle

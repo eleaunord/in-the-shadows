@@ -11,6 +11,7 @@ public class ObjectRotator3 : MonoBehaviour
     public float moveSpeed = 0.01f;
 
     // The currently selected object (shared across all instances)
+    // static appliqué à un champ d'instance ; donné globale
     private static ObjectRotator3 selectedObject = null; // partagee entre tt les instances du script
 
     private bool isDragging = false;
