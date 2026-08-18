@@ -92,7 +92,6 @@ public class SaveManager : MonoBehaviour
         _instance = this; // si pas d'autre instance, on enregistre l'instance commme la ref officielle
         DontDestroyOnLoad(gameObject); // et on la rend persistente
     }
-
     public void SetTestMode(bool value)
     {
         IsTestMode = value;
@@ -112,6 +111,11 @@ public class SaveManager : MonoBehaviour
     {
         //Debug.Log($"[SaveManager] MarkPuzzleSolved({puzzleIndex}) appelé");
 
+        // Only the FIRST time puzzleIndex is solved does the *next* puzzle
+        // transition from locked to unlocked. Replaying an already-solved
+        // puzzle must not re-arm the unlock animation for the next one.
+        bool alreadySolved = IsPuzzleSolved(puzzleIndex);
+
         // PERSISTENT
 
         //PlayerPrefs.SetInt(clé, valeur)
@@ -120,10 +124,13 @@ public class SaveManager : MonoBehaviour
 
         // TRANSITOIRE (pr l'anim)
 
-        int nextIndex = puzzleIndex + 1;
-        if (nextIndex <= TOTAL_PUZZLES)
+        if (!alreadySolved)
         {
-            _pendingUnlockedPuzzleIndex = nextIndex;
+            int nextIndex = puzzleIndex + 1;
+            if (nextIndex <= TOTAL_PUZZLES)
+            {
+                _pendingUnlockedPuzzleIndex = nextIndex;
+            }
         }
     }
 
